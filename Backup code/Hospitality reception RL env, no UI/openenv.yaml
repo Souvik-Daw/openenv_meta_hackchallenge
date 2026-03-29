@@ -1,0 +1,82 @@
+spec_version: 1
+name: healthcare_scheduling
+description: >
+  Healthcare Appointment Scheduling RL environment.
+  An AI agent receives a natural-language patient request, identifies
+  the correct medical department and doctor, and books an appointment
+  using a set of structured tool calls.
+type: space
+runtime: fastapi
+app: healthcare_scheduling.server.app:app
+port: 8000
+
+action_schema:
+  type: object
+  properties:
+    tool:
+      type: string
+      enum:
+        - get_departments
+        - get_doctors
+        - check_availability
+        - book_appointment
+        - ask_user_clarification
+      description: "Tool to invoke. One call per step."
+    parameters:
+      type: object
+      description: "Keyword arguments for the selected tool."
+    metadata:
+      type: object
+      description: "Optional agent metadata (reasoning, etc.)."
+  required:
+    - tool
+
+observation_schema:
+  type: object
+  properties:
+    done:
+      type: boolean
+    reward:
+      type: number
+    tool_result:
+      type: object
+      description: "Data returned by the tool that was just called."
+    tool_called:
+      type: string
+      nullable: true
+    user_request:
+      type: string
+    identified_department:
+      type: string
+      nullable: true
+    selected_doctor:
+      type: string
+      nullable: true
+    selected_slot:
+      type: string
+      nullable: true
+    steps_taken:
+      type: integer
+    max_steps:
+      type: integer
+    conversation_history:
+      type: array
+    message:
+      type: string
+  required:
+    - done
+    - reward
+    - user_request
+    - steps_taken
+    - max_steps
+
+tasks:
+  - id: easy_chest_pain
+    difficulty: easy
+    description: "User reports chest pain → Cardiology → Dr. Sarah Smith"
+  - id: medium_skin_rash
+    difficulty: medium
+    description: "User has a 2-week skin rash → Dermatology → Dr. Priya Patel"
+  - id: hard_ambiguous_pain
+    difficulty: hard
+    description: "Ambiguous pain → clarification required → Cardiology → Dr. Sarah Smith"

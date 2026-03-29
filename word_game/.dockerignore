@@ -1,0 +1,47 @@
+# ── Virtual environments & local Python builds ────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Python bytecode ───────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+
+# ── Build / dist artifacts ────────────────────────────────────────────────────
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# ── uv / pip caches ───────────────────────────────────────────────────────────
+.cache/
+.uv/
+
+# ── IDE & editor files ────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Test artifacts ────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# ── Secrets & local config ────────────────────────────────────────────────────
+.env
+.env.*
+*.pem
+*.key
+
+# ── Git internals ─────────────────────────────────────────────────────────────
+.git/
+.gitignore
