@@ -1,7 +1,7 @@
 """
 Groq-powered LLM agent for the Healthcare Appointment Scheduling environment.
 
-Uses the `llama3-70b-8192` model via the Groq API.
+Uses the `custom` model via the Groq API.
 
 The agent reads the current observation and generates a structured tool-call
 action (tool name + parameters) using a JSON-mode prompt.  It loops until the
@@ -94,7 +94,7 @@ No extra text, no markdown code blocks — only raw JSON.
 load_dotenv(find_dotenv())
 
 class GroqAgent:
-    """LLM agent using Groq (llama3-70b) to solve healthcare scheduling tasks."""
+    """LLM agent using Groq (llama-3.1-8b-instant) to solve healthcare scheduling tasks."""
 
     MODEL = os.getenv("GROQ_MODEL")
     MAX_RETRIES = 3

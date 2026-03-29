@@ -28,6 +28,11 @@ openspiel folder structure modify to work in HF space
 ## Hospitality reception RL env
 
 Hospitality reception env (Done)
+Enhancement possible :
+
+1. MCP server
+2. HF space, fast api and docker
+3. Database to replace static data
 
 python run_baseline.py
 python run_baseline.py --task hard

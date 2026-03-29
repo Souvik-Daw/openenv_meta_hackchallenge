@@ -3,7 +3,7 @@
 run_baseline.py — Baseline evaluation script for the Healthcare Appointment
                   Scheduling RL environment.
 
-Runs the Groq (llama3-70b) agent over all three tasks (easy, medium, hard)
+Runs the Groq agent over all three tasks (easy, medium, hard)
 and prints a final score report.
 
 Usage:
