@@ -111,8 +111,8 @@ def grade_full_breakdown(
 
     Returns a dict with individual component scores and the final total.
     """
-    correct_dept   = state.correct_department or task_config.get("correct_department")
-    correct_doctor = state.correct_doctor or task_config.get("correct_doctor")
+    correct_dept   = task_config["correct_department"]
+    correct_doctor = task_config["correct_doctor"]
     min_steps      = task_config.get("expected_min_steps", 4)
     requires_clr   = task_config.get("requires_clarification", False)
 

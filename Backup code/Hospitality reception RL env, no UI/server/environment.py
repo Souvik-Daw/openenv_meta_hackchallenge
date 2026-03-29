@@ -276,15 +276,6 @@ class HealthcareAppointmentEnvironment:
             else:
                 reward += -0.05  # slight penalty for late clarification
                 message = "Clarification obtained (late penalty -0.05)."
-                
-            # If episode started ambiguously, update ground truth based on response
-            if s.correct_department is None and result.get("user_response"):
-                from .data import map_symptoms_to_department, map_symptoms_to_doctor
-                user_res = result["user_response"]
-                new_dept = map_symptoms_to_department(user_res)
-                if new_dept:
-                    s.correct_department = new_dept
-                    s.correct_doctor = map_symptoms_to_doctor(user_res, new_dept)
 
         # Check max steps
         if s.step_count >= self.MAX_STEPS and not done:
