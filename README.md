@@ -34,6 +34,8 @@ Enhancement possible :
 2. HF space, fast api and docker
 3. Database to replace static data
 
+https://fergus2000-hospital-env.hf.space/health
+
 python run_baseline.py
 python run_baseline.py --task hard
 

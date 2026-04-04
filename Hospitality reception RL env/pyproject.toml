@@ -43,9 +43,8 @@ packages = [
     "healthcare_scheduling.tasks",
     "healthcare_scheduling.agent",
 ]
-package-dir = {
-    "healthcare_scheduling"        = ".",
-    "healthcare_scheduling.server" = "server",
-    "healthcare_scheduling.tasks"  = "tasks",
-    "healthcare_scheduling.agent"  = "agent",
-}
+[tool.setuptools.package-dir]
+"healthcare_scheduling" = "."
+"healthcare_scheduling.server" = "server"
+"healthcare_scheduling.tasks" = "tasks"
+"healthcare_scheduling.agent" = "agent"

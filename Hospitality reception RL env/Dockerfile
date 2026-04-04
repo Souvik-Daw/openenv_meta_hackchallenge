@@ -14,7 +14,7 @@
 #
 # For Hugging Face Spaces: openenv push uploads this file to the Space repo root.
 
-ARG BASE_IMAGE=python:3.11-slim
+ARG BASE_IMAGE=ghcr.io/meta-pytorch/openenv-base:latest
 FROM ${BASE_IMAGE} AS builder
 
 WORKDIR /app
@@ -25,7 +25,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 ARG BUILD_MODE=standalone
-ARG ENV_NAME=healthcare_scheduling
+ARG ENV_NAME=healthcare_env
 
 # Copy the full project root into /app/env
 COPY . /app/env
@@ -57,18 +57,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # ── Runtime stage ─────────────────────────────────────────────────────────
 FROM ${BASE_IMAGE}
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
-    rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 # Copy venv and project files from builder
 COPY --from=builder /app/env/.venv /app/.venv
 COPY --from=builder /app/env       /app/env
-
-# HF Spaces runs as user 1000 (non-root)
-RUN chown -R 1000:1000 /app
 
 # Activate the venv
 ENV PATH="/app/.venv/bin:$PATH"
@@ -76,11 +69,12 @@ ENV PATH="/app/.venv/bin:$PATH"
 # PYTHONPATH: /app/env is the package root
 ENV PYTHONPATH="/app/env:$PYTHONPATH"
 
-EXPOSE 8000
+ENV ENABLE_WEB_INTERFACE=true
+
+EXPOSE 7860
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:7860/health || exit 1
 
 # Default command: start the FastAPI server
-CMD ["uvicorn", "healthcare_scheduling.server.app:app", \
-     "--host", "0.0.0.0", "--port", "8000", "--app-dir", "/app/env"]
+CMD ["sh", "-c", "cd /app/env && uvicorn server.app:app --host 0.0.0.0 --port 7860"]
