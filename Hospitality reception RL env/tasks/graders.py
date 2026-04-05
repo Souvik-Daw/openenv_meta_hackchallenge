@@ -54,7 +54,6 @@ def grade_episode(state: AppointmentState, task_config: Dict[str, Any]) -> float
     if not is_rebook and used_get_departments:
         score += 1.0
 
-    # 0.5 Missing stage bonus for rebooks
     if is_rebook:
         score += 2.0
 
@@ -63,7 +62,15 @@ def grade_episode(state: AppointmentState, task_config: Dict[str, Any]) -> float
         score += 1.0
 
     # 2. Doctor correctness
-    if state.selected_doctor == correct_doctor:
+    is_doctor_correct = state.selected_doctor == correct_doctor
+    if is_rebook and state.selected_doctor and hasattr(state, "user_request"):
+        req_l = state.user_request.lower()
+        doc_l = state.selected_doctor.lower()
+        doc_last = state.selected_doctor.split(" ")[-1].lower()
+        if doc_l in req_l or doc_last in req_l:
+            is_doctor_correct = True
+
+    if is_doctor_correct:
         score += 1.0
 
     # 3. Booking success
@@ -133,7 +140,15 @@ def grade_full_breakdown(
     missing_stage_bonus = 2.0 if is_rebook else 0.0
     get_dept_score = 1.0 if not is_rebook and used_get_departments else 0.0
     dept_score  = 1.0 if not is_rebook and state.identified_department == correct_dept else 0.0
-    doc_score   = 1.0 if state.selected_doctor == correct_doctor else 0.0
+    is_doctor_correct = state.selected_doctor == correct_doctor
+    if is_rebook and state.selected_doctor and hasattr(state, "user_request"):
+        req_l = state.user_request.lower()
+        doc_l = state.selected_doctor.lower()
+        doc_last = state.selected_doctor.split(" ")[-1].lower()
+        if doc_l in req_l or doc_last in req_l:
+            is_doctor_correct = True
+
+    doc_score   = 1.0 if is_doctor_correct else 0.0
     book_score  = 1.0 if state.booking_successful else 0.0
 
 
@@ -150,10 +165,11 @@ def grade_full_breakdown(
         "difficulty": task_config["difficulty"],
         "used_get_departments": used_get_departments,
         "get_departments_score": get_dept_score,
+        "is_rebook": is_rebook,
         "missing_stage_bonus": missing_stage_bonus,
-        "department_correct": state.identified_department == correct_dept,
+        "department_correct": True if is_rebook else state.identified_department == correct_dept,
         "department_score": dept_score,
-        "doctor_correct": state.selected_doctor == correct_doctor,
+        "doctor_correct": is_doctor_correct,
         "doctor_score": doc_score,
         "booking_successful": state.booking_successful,
         "booking_score": book_score,

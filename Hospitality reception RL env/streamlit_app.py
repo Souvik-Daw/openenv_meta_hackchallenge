@@ -378,13 +378,28 @@ def _find_best_task_config(user_request: str):
             return dept, doc, cfg_fn
 
     # ── 2. Primary router: symptom keyword engine ─────────────────────────────
-    #    map_symptoms_to_department has the proper SYMPTOM_KEYWORDS table,
-    #    e.g. "back pain" → Orthopedics, "migraine" → Neurology, etc.
-    #    This is the ONLY reliable method for free-text inputs.
+    #    map_symptoms_to_department has the proper SYMPTOM_KEYWORDS table.
     auto_dept = map_symptoms_to_department(user_request)
 
-    # Determine the most suitable doctor based on specialization overlap
-    if auto_dept and auto_dept in DOCTORS:
+    from server.data import DOCTORS
+    explicit_doctor = None
+    explicit_doc_dept = None
+    req_lower = user_request.lower()
+    for dept, doc_list in DOCTORS.items():
+        for doc_obj in doc_list:
+            d_name = doc_obj["name"].lower()
+            d_last = doc_obj["name"].split()[-1].lower()
+            if d_name in req_lower or d_last in req_lower:
+                explicit_doctor = doc_obj["name"]
+                explicit_doc_dept = dept
+                break
+        if explicit_doctor:
+            break
+
+    if explicit_doctor:
+        auto_dept = explicit_doc_dept
+        auto_doc = explicit_doctor
+    elif auto_dept and auto_dept in DOCTORS:
         from server.data import department_to_doctor
         auto_doc = department_to_doctor(user_request, auto_dept)
     else:
@@ -396,6 +411,8 @@ def _find_best_task_config(user_request: str):
     _dept = auto_dept   # capture for closure
     _doc  = auto_doc
 
+    is_rebook_intent = "rebook" in req_lower or explicit_doctor is not None
+
     def dynamic_config():
         return {
             "task_id": "custom",
@@ -403,8 +420,9 @@ def _find_best_task_config(user_request: str):
             "user_request": user_request,
             "correct_department": _dept,
             "correct_doctor": _doc,
-            "expected_min_steps": 4,
-            "requires_clarification": _dept is None,
+            "expected_min_steps": 2 if is_rebook_intent else 4,
+            "requires_clarification": _dept is None and not is_rebook_intent,
+            "is_rebook": is_rebook_intent,
         }
 
     return _dept, _doc, dynamic_config
@@ -515,7 +533,7 @@ def _render_final_result() -> None:
     m1, m2, m3 = st.columns(3)
     with m1:
         st.markdown(
-            f'<div class="metric-tile"><div class="metric-value">{score:.2%}</div><div class="metric-label">Final Score</div></div>',
+            f'<div class="metric-tile"><div class="metric-value">{score:g}/4</div><div class="metric-label">Final Score</div></div>',
             unsafe_allow_html=True,
         )
     with m2:
@@ -530,15 +548,19 @@ def _render_final_result() -> None:
             unsafe_allow_html=True,
         )
 
+    is_rebook = result.get("is_rebook", False)
     # Score breakdown bar
     st.markdown("#### Score Breakdown")
-    components = [
-        ("Skipped Bonus", result.get("missing_stage_bonus", 0.0), 2.0, "#f472b6"),
-        ("Get Depts",  result.get("get_departments_score", 0.0), 1.0, "#93c5fd"),
-        ("Department", result.get("department_score", 0.0), 1.0, "#a78bfa"),
+    components = []
+    if not is_rebook:
+        components.extend([
+            ("Get Depts",  result.get("get_departments_score", 0.0), 1.0, "#93c5fd"),
+            ("Department", result.get("department_score", 0.0), 1.0, "#a78bfa"),
+        ])
+    components.extend([
         ("Doctor",     result.get("doctor_score",     0.0), 1.0, "#60a5fa"),
         ("Booking",    result.get("booking_score",    0.0), 1.0, "#34d399"),
-    ]
+    ])
     for label, earned, max_val, color in components:
         pct = earned / max_val if max_val > 0 else 0
         fill_w = int(pct * 100)
@@ -811,18 +833,9 @@ with st.sidebar:
     step_delay = st.slider("step_delay", min_value=0.0, max_value=2.0, value=0.7, step=0.1, label_visibility="collapsed")
 
     st.markdown("---")
-    st.markdown("**Predefined Tasks**")
-    if st.button("📋 Easy — Chest Pain"):
-        st.session_state["prefill_request"] = EASY_REQ
-    if st.button("📋 Medium — Skin Rash"):
-        st.session_state["prefill_request"] = MED_REQ
-    if st.button("📋 Hard — Ambiguous Pain"):
-        st.session_state["prefill_request"] = HARD_REQ
-
-    st.markdown("---")
     st.markdown(
         "<div style='font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center'>"
-        "Healthcare Scheduling RL · OpenEnv · Powered by Groq"
+        "Healthcare Scheduling RL · OpenEnv"
         "</div>",
         unsafe_allow_html=True,
     )

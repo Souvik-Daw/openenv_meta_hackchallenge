@@ -200,17 +200,20 @@ class HealthcareAppointmentEnvironment:
                 message = f"Doctor '{doctor}' not found."
             else:
                 dept_of_doc = doc_record["department"]
+                is_rebook_intent = "rebook" in s.user_request.lower()
+                doctor_in_request = doctor.lower() in s.user_request.lower() or doctor.split(" ")[-1].lower() in s.user_request.lower()
+
                 if (
                     s.correct_department
                     and dept_of_doc == s.correct_department
                     and doc_record["name"] == s.correct_doctor
-                ):
+                ) or (is_rebook_intent and doctor_in_request):
                     if s.selected_doctor != doc_record["name"]:
                         reward += 1.0
                         message = f"Checking availability for the right doctor ({doctor}). (+1.0)"
                     else:
                         message = f"Checking availability for {doctor} again."
-                elif dept_of_doc != s.correct_department:
+                elif s.correct_department is not None and dept_of_doc != s.correct_department:
                     reward += -0.50
                     message = (
                         f"Doctor '{doctor}' is in '{dept_of_doc}', "
@@ -232,6 +235,13 @@ class HealthcareAppointmentEnvironment:
 
                 dept_correct = booked_dept == s.correct_department
                 doctor_correct = booked_doctor == s.correct_doctor
+
+                is_rebook_intent = "rebook" in s.user_request.lower()
+                doctor_in_request = booked_doctor.lower() in s.user_request.lower() or booked_doctor.split(" ")[-1].lower() in s.user_request.lower()
+
+                if is_rebook_intent and doctor_in_request:
+                    dept_correct = True
+                    doctor_correct = True
 
                 booking_reward = 0.0
                 if dept_correct and doctor_correct:
@@ -266,14 +276,34 @@ class HealthcareAppointmentEnvironment:
             # Clarification resolves ambiguous states but doesn't grant bonus score directly
             message = "Got user clarification."
                 
-            # If episode started ambiguously, update ground truth based on response
-            if s.correct_department is None and result.get("user_response"):
-                from .data import map_symptoms_to_department, department_to_doctor
+            # Allow user clarification to dynamically update or override the ground truth
+            if result.get("user_response"):
+                from .data import DOCTORS, map_symptoms_to_department, department_to_doctor
                 user_res = result["user_response"]
-                new_dept = map_symptoms_to_department(user_res)
-                if new_dept:
-                    s.correct_department = new_dept
-                    s.correct_doctor = department_to_doctor(user_res, new_dept)
+                s.user_request = s.user_request + " | " + user_res
+                
+                explicit_doctor = None
+                explicit_doc_dept = None
+                res_lower = user_res.lower()
+                for dept, doc_list in DOCTORS.items():
+                    for doc_obj in doc_list:
+                        d_name = doc_obj["name"].lower()
+                        d_last = doc_obj["name"].split()[-1].lower()
+                        if d_name in res_lower or d_last in res_lower:
+                            explicit_doctor = doc_obj["name"]
+                            explicit_doc_dept = dept
+                            break
+                    if explicit_doctor:
+                        break
+
+                if explicit_doctor:
+                    s.correct_department = explicit_doc_dept
+                    s.correct_doctor = explicit_doctor
+                else:
+                    new_dept = map_symptoms_to_department(user_res)
+                    if new_dept:
+                        s.correct_department = new_dept
+                        s.correct_doctor = department_to_doctor(user_res, new_dept)
 
         # Check max steps
         if s.step_count >= self.MAX_STEPS and not done:
