@@ -22,7 +22,7 @@ IMAGE_NAME = os.getenv("IMAGE_NAME")
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1") #OK
 MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-oss-120b:groq") #OK
 API_KEY = os.getenv("API_KEY") or os.getenv("HF_TOKEN")  # Support both API_KEY and HF_API_KEY for flexibility
-TASK_NAME = os.getenv("TASK_NAME") or "hmt003" #OK
+TASK_NAME = os.getenv("TASK_NAME") or "hmt001" #OK
 BENCHMARK = os.getenv("BENCHMARK") or "hospital_manage_triage" #OK
 
 MAX_STEPS = 10
@@ -31,7 +31,7 @@ TEMPERATURE = 0.7
 def main() -> None:
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
     # https://stavust28-hospitalmanage-triage-env.hf.space
-    env = HospitalmanageTriageEnv(base_url="http://localhost:8000").sync()
+    env = HospitalmanageTriageEnv(base_url="https://stavust28-hospitalmanage-triage-env.hf.space").sync()
 
     history: List[str] = []
     rewards: List[float] = []

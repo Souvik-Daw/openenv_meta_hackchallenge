@@ -34,7 +34,7 @@ class ToolSpec:
                 return 'Error occurred while wrapping doctor.'
 
 
-        result = search(conn_or_path="server\hospital.db",
+        result = search(conn_or_path="server/hospital.db",
                         table='doctors',
                         columns=["doctor_id", "doctor_name"],
                         where=f"department_name = ? AND is_available_opd = ? AND day_of_week = ?",
@@ -53,7 +53,7 @@ class ToolSpec:
                       "doctor_name": doctor_name,
                       "patient_name": patient_name,
                       "day": datetime.now().strftime('%Y-%m-%d')}
-        result = insert_db(conn_or_path="server\hospital.db",
+        result = insert_db(conn_or_path="server/hospital.db",
                   table='appointments',
                   data=data)
         if result:
@@ -74,8 +74,8 @@ class ToolSpec:
             columns,where,params = ["doctor_id", "doctor_name", "day"], f"patient_id = ?", (patient_id,)
         elif doctor_id:
             columns,where,params = ["patient_id", "patient_name", "day"], f"doctor_id = ?", (doctor_id,)
-        
-        result = search(conn_or_path="server\hospital.db",
+
+        result = search(conn_or_path="server/hospital.db",
                         table='appointments',
                         columns=columns,
                         where=where,
