@@ -12,7 +12,7 @@ tasks:
     max_steps: 150
     score_range: [0.01, 0.99]
     grader:
-      function: server.graders.easy_grader
+      function: hospitalmanage_triage_env.server.graders.easy_grader
       task_length: 1
 
   - id: hmt002
@@ -21,7 +21,7 @@ tasks:
     max_steps: 150
     score_range: [0.01, 0.99]
     grader:
-      function: server.graders.medium_grader
+      function: hospitalmanage_triage_env.server.graders.medium_grader
       task_length: 2
 
   - id: hmt003
@@ -30,5 +30,5 @@ tasks:
     max_steps: 150
     score_range: [0.01, 0.99]
     grader:
-      function: server.graders.hard_grader
+      function: hospitalmanage_triage_env.server.graders.hard_grader
       task_length: 3
