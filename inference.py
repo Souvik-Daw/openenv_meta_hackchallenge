@@ -234,6 +234,12 @@ def parse_task(task_name: str):
     return next((t for t in task if t["task_id"] == task_name), None)
 
 if __name__ == "__main__":
-    for task_name in ['hmt001', 'hmt002', 'hmt003']:
-        main(task_name)
+    import json
+    with open('task.json', 'r') as f:
+        tasks = json.load(f)
+        
+    for task in tasks:
+        task_id = task["task_id"]
+        print(f"Starting inference for: {task_id}")
+        main(task_id)
         time.sleep(30)

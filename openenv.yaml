@@ -6,7 +6,7 @@ app: hospitalmanage_triage_env.server.app:app
 port: 8000
 
 tasks:
-  - id: easy_grader
+  - id: hmt001
     difficulty: easy
     description: Test the hospital management triage environment = One step task -> Just make an appointment
     max_steps: 150
@@ -14,7 +14,7 @@ tasks:
     task_length: 1
     grader: graders.easy_grader:EasyGrader
 
-  - id: medium_grader
+  - id: hmt002
     difficulty: medium
     description: Test the hospital management triage environment =  Two step task -> Get the proper doctor for the patient and then make an appointment
     max_steps: 150
@@ -22,7 +22,7 @@ tasks:
     task_length: 2
     grader: graders.medium_grader:MediumGrader
 
-  - id: hard_grader
+  - id: hmt003
     difficulty: hard
     description: Test the hospital management triage environment =  Three step task -> Get the proper doctor for the patient, make an appointment, and then check the appointment details
     max_steps: 150
