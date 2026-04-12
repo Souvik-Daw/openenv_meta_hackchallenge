@@ -142,7 +142,7 @@ def insert_db(
 @lru_cache(maxsize=None)
 def train_tfidf():
     
-    with open("hospitalmanage_triage_env/server/symptoms.json") as f:
+    with open("server/symptoms.json") as f:
         __data = json.load(f)
     
     conditions = [item["condition"] for item in __data]

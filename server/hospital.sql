@@ -23,6 +23,7 @@ INSERT INTO doctors (doctor_id, department_id, day_of_week, doctor_name, departm
 (2, 1, 'Tuesday', 'Dr. Priya Sharma', 'Neurology', TRUE, FALSE),
 (3, 1, 'Wednesday', 'Dr. Maria Lopez', 'Neurology', FALSE, TRUE),
 (4, 1, 'Thursday', 'Dr. David Chen', 'Neurology', TRUE, TRUE),
+(1, 1, 'Sunday', 'Dr. Alex Kim', 'Neurology', TRUE, TRUE),
 
 (5, 2, 'Monday', 'Dr. Alex Kim', 'Cardiology', TRUE, TRUE),
 (6, 2, 'Tuesday', 'Dr. Samuel Green', 'Cardiology', TRUE, FALSE),

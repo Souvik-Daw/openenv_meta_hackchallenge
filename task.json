@@ -1,10 +1,11 @@
 [
-    {"task_id": 1,
-     "description": "Test the hospital management triage environment",
+    {"task_id": "hmt001",
+     "description": "Test the hospital management triage environment: One step task -> Just make an appointment",
+     "query": "Hey I, Kunal Day with patient id 1001, wants to make an appointment with Dr. Smith. , doctor ID 1234, for consultation",
      "patient_id": 1001,
      "doctor_id": 1234,
      "doctor_name": "Dr. Smith",
-     "patient_name": "John Doe",
+     "patient_name": "Kunal Dey",
      "department" : "Neurology",
      "expected_output": {
          "tool_seq": ["make_appointment"],
@@ -12,8 +13,9 @@
      }
     },
     {
-        "task_id": 2,
-        "description": "Test the hospital management triage environment with a different patient",
+        "task_id": "hmt002",
+        "description": "Test the hospital management triage environment: Two step task -> Get the proper doctor for the patient and then make an appointment",
+        "query": "Hey I, Jane Doe with patient id 1002, want to make an appointment with Neurology department",
         "patient_id": 1002,
         "doctor_id": 1235,
         "doctor_name": "Dr. Maria Lopez",
@@ -25,10 +27,11 @@
         }
     },
     {
-        "task_id": 3,
-        "description": "Test the hospital management triage environment with a different patient",
+        "task_id": "hmt003",
+        "description": "Test the hospital management triage environment: Three step task -> ",
+        "query": "Hey I, Alice Smith with patient id 1003, is having head aches, and needs to see a doctor.",
         "patient_id": 1003,
-        "doctor_id": 1236,
+        "doctor_id": 1276,
         "doctor_name": "Dr. John Doe",
         "patient_name": "Alice Smith",
         "department": "Neurology",

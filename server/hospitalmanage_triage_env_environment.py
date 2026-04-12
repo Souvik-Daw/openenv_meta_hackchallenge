@@ -116,7 +116,7 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
             },
         )
 
-    def step(self, action: Action, timeout_s: Optional[float] = None) -> HospitalmanageTriageObservation:  # type: ignore[override]
+    def step(self, action: Action, timeout_s: Optional[float] = 120) -> HospitalmanageTriageObservation:  # type: ignore[override]
         """
         Execute a step in the environment by echoing the message.
 
@@ -174,7 +174,7 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
     async def step_async(
         self,
         action: Action,
-        timeout_s: Optional[float] = None,
+        timeout_s: Optional[float] = 120.0,
     ) -> HospitalmanageTriageObservation:
         """
         Async step used by the WebSocket handler.
