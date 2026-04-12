@@ -154,7 +154,7 @@ def log_step(task: str, step: int, action: str, reward: float, done: bool, error
 
 def log_end(task: str, success: bool, steps: int, score: float, rewards: List[float]) -> None:
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
-    print(f"[END] task={task} success={str(success).lower()} steps={steps} score={score:.3f} rewards={rewards_str}", flush=True)
+    print(f"[END] task={task} score={score:.3f} success={str(success).lower()} steps={steps} rewards={rewards_str}", flush=True)
 
 
 def build_user_prompt(step: int, last_echoed: str, last_reward: float, history: List[str]) -> str:
