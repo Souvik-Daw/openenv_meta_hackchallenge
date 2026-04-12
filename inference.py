@@ -31,7 +31,7 @@ TEMPERATURE = 0.7
 def main() -> None:
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
     # https://stavust28-hospitalmanage-triage-env.hf.space
-    env = HospitalmanageTriageEnv(base_url="https://stavust28-hospitalmanage-triage-env.hf.space").sync()
+    env = HospitalmanageTriageEnv(base_url="http://localhost:8000").sync()
 
     history: List[str] = []
     rewards: List[float] = []
@@ -80,7 +80,7 @@ def main() -> None:
                 steps_taken = step
                 last_message = obs.result
                 last_reward = reward
-
+                logger.info("Step result: %s", last_message) #
                 log_step(step=step, action=message, reward=reward, done=done, error=error)
 
                 history.append(f"Step {step}: {message!r} -> reward {reward:+.2f}")
@@ -88,8 +88,8 @@ def main() -> None:
                 if done:
                     break
 
-            score = sum(rewards) / len(task['expected_output']['tool_seq'])
-            score = min(max(score, 0.0), 1.0)  # clamp to [0, 1]
+            score = sum(rewards) / len(rewards)
+            score = max(0.01, min(0.99, score))  # clamp to [0, 1]
             success = score >= 0.5 and done
     finally:
         try:
@@ -157,7 +157,7 @@ def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> No
 
 
 def build_user_prompt(step: int, last_echoed: str, last_reward: float, history: List[str]) -> str:
-    history_block = "\n".join(history[-2:]) if history else "None"
+    history_block = "\n".join(history[-5:]) if history else "None"
     return textwrap.dedent(
         f"""
         Step: {step}

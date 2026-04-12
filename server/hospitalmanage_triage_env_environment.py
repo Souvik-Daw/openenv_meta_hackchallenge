@@ -14,6 +14,7 @@ Perfect for testing HTTP server infrastructure.
 from typing import Any, Optional
 from uuid import uuid4
 import random
+import inspect
 
 from openenv.core.env_server.mcp_environment import MCPEnvironment
 from openenv.core.env_server.interfaces import Action
@@ -48,6 +49,26 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
     # When True, multiple WebSocket clients can connect simultaneously, each
     # getting their own environment instance (when using factory mode in app.py).
     SUPPORTS_CONCURRENT_SESSIONS: bool = True
+
+    def _compute_failure_score(self, tool_name: str, arguments: dict):
+        # Compute a failure score for the given tool and arguments.
+        # This is a placeholder implementation.
+        reward = 1.0
+        message = ""
+        if tool_name not in dir(self.tools):
+            reward -= 0.3
+            message += f"Invalid tool name: {tool_name}"
+        for arg_name,_ in arguments.items():
+            if arg_name not in inspect.getfullargspec(getattr(self.tools, tool_name)).args:
+                reward -= 0.3
+                message += f"Invalid argument: {arg_name} "
+                break
+        for _,arg_value in arguments.items():
+            if arg_value not in self._state.output_sequence[self._state.tool_state_step]:
+                reward -= 0.4
+                message += f"Incorrect argument: {arg_value},type({type(arg_value)}). in {self._state.output_sequence[self._state.tool_state_step]}"
+                break
+        return message, reward
 
     def __init__(self):
         """Initialize the hospitalmanage_triage_env environment."""
@@ -128,15 +149,17 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
         """
         self._state.step_count += 1
 
-        if isinstance(action, CallToolAction) and action.tool_name not in dir(self.tools):
-            return HospitalmanageTriageObservation(
-                tool_name=action.tool_name,
-                done=False,
-                reward=-0.5,
-                metadata={
-                    "error": f"Unknown tool: {action.tool_name}. "
-                },
-            )
+
+        if isinstance(action, CallToolAction):
+            message, reward = self._compute_failure_score(action.tool_name, action.arguments)
+            if reward < 1.0:
+                return HospitalmanageTriageObservation(
+                    tool_name=action.tool_name,
+                    done=False,
+                    reward=reward,
+                    result=message,
+                )
+
 
         message = super().step(action, timeout_s=timeout_s)
         # Avoid referencing an undefined CallToolResult symbol; check for a result attribute instead.
@@ -151,13 +174,7 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
             if key != "episode_id":
                 setattr(self._state, key, value)
         # tool reward  + add output reward
-        if self._state.tool_call_sequence[self._state.tool_state_step] == tool_called and \
-           self._state.output_sequence[self._state.tool_state_step] in output_message:
-            reward = 1.0 / len(self._state.tool_call_sequence)
-            self._state.tool_state_step += 1
-        else:
-            reward = -0.5 / len(self._state.tool_call_sequence)
-        # condition for done
+        self._state.tool_state_step += 1
         done_tag = False
         if self._state.tool_state_step >= len(self._state.tool_call_sequence):
             done_tag = True
@@ -167,7 +184,7 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
             result=f'Patient id {self._state.patient_id} \n ' + (output_message or '<Tool Error>'),
             tool_executed=tool_called,
             done=done_tag,
-            reward=reward,
+            reward=max(0.01, min(0.99, reward)),
             metadata={"original_message": output_message, "step": self._state.step_count},
         )
     
@@ -184,16 +201,17 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
         """
         self._state.step_count += 1
 
-        if isinstance(action, CallToolAction) and action.tool_name not in dir(self.tools):
-            return HospitalmanageTriageObservation(
-                tool_name=action.tool_name,
-                done=False,
-                reward=-0.5,
-                metadata={
-                    "error": f"Unknown tool: {action.tool_name}. "
-                },
-            )
-        
+        if isinstance(action, CallToolAction):
+            message, reward = self._compute_failure_score(action.tool_name, action.arguments)
+            if reward < 1.0:
+                return HospitalmanageTriageObservation(
+                    tool_name=action.tool_name,
+                    done=False,
+                    reward=reward,
+                    result=message,
+                )
+            
+        print(reward)
         message =  await super().step_async(action, timeout_s=timeout_s)
 
         if hasattr(message, "result") and message.result is not None:
@@ -206,13 +224,10 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
         for key, value in tool_state.items():
             if key != "episode_id":
                 setattr(self._state, key, value)
+        
         # tool reward  + add output reward
-        if self._state.tool_call_sequence[self._state.tool_state_step] == tool_called and \
-           self._state.output_sequence[self._state.tool_state_step] in output_message:
-            reward = 1.0 / len(self._state.tool_call_sequence)
-            self._state.tool_state_step += 1
-        else:
-            reward = -0.5 / len(self._state.tool_call_sequence)
+        self._state.tool_state_step += 1
+
         # condition for done
         done_tag = False
         if self._state.tool_state_step >= len(self._state.tool_call_sequence):
@@ -223,7 +238,7 @@ class HospitalmanageTriageEnvironment(MCPEnvironment):
             result=f'Patient id {self._state.patient_id} \n ' + (output_message or '<Tool Error>'),
             tool_executed=tool_called,
             done=done_tag,
-            reward=reward,
+            reward=max(0.01, min(0.99, reward)),
             metadata={"original_message": output_message, "step": self._state.step_count},
         )
 

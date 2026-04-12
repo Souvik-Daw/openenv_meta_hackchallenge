@@ -84,3 +84,12 @@ class ToolSpec:
                         )[0]
         
         return HospitalToolsOutput(tool="get_appointment", message=__get_appointment_wrapper(result), tool_state={})
+    
+if __name__ == "__main__":
+    import inspect
+
+    tools = ToolSpec()
+    # method to call
+    method = "get_department"
+    print(getattr(tools, method))
+    print(inspect.getfullargspec(getattr(tools, method)).args)
