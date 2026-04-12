@@ -5,3 +5,30 @@ runtime: fastapi
 app: hospitalmanage_triage_env.server.app:app
 port: 8000
 
+tasks:
+  - id: hmt001
+    difficulty: easy
+    description: Test the hospital management triage environment: One step task -> Just make an appointment
+    max_steps: 150
+    score_range: [0.0, 1.0]
+    grader:
+      function: server.graders.easy_grader
+      task_length: 1
+
+  - id: hmt002
+    difficulty: medium
+    description: Test the hospital management triage environment: Two step task -> Get the proper doctor for the patient and then make an appointment
+    max_steps: 150
+    score_range: [0.0, 1.0]
+    grader:
+      function: server.graders.medium_grader
+      task_length: 2
+
+  - id: hmt003
+    difficulty: hard
+    description: Test the hospital management triage environment: Three step task -> 
+    max_steps: 150
+    score_range: [0.0, 1.0]
+    grader:
+      function: server.graders.hard_grader
+      task_length: 3
