@@ -242,4 +242,4 @@ if __name__ == "__main__":
         task_id = task["task_id"]
         # print(f"Starting inference for: {task_id}")
         main(task_id)
-        time.sleep(30)
+        # time.sleep(30)
