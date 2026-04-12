@@ -1,5 +1,5 @@
 [
-    {"task_id": "hmt001",
+    {"task_id": "hmteasy",
      "description": "Test the hospital management triage environment: One step task -> Just make an appointment",
      "query": "Hey, I am Kunal Day with patient id 1001, wants to make an appointment with Dr. Smith. , doctor ID 1234, for consultation",
      "patient_id": 1001,
@@ -13,7 +13,7 @@
      }
     },
     {
-        "task_id": "hmt002",
+        "task_id": "hmtmedium",
         "description": "Test the hospital management triage environment: Two step task -> Get the proper doctor for the patient and then make an appointment",
         "query": "Hey, I am Jane Doe with patient id 1002, want to make an appointment with Neurology department",
         "patient_id": 1002,
@@ -27,7 +27,7 @@
         }
     },
     {
-        "task_id": "hmt003",
+        "task_id": "hmthard",
         "description": "Test the hospital management triage environment: Three step task -> ",
         "query": "Hey, I am Alice Smith with patient id 1003, is having headache, migraine and needs to see a doctor.",
         "patient_id": 1003,
