@@ -15,8 +15,8 @@ from dotenv import load_dotenv
 # Load variables from .env file into the environment
 # load_dotenv(".env.example")
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+#logging.basicConfig(level=logging.INFO)
+#logger = logging.getLogger(__name__)
 
 IMAGE_NAME = os.getenv("IMAGE_NAME")
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1") #OK
