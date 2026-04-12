@@ -11,24 +11,21 @@ tasks:
     description: Test the hospital management triage environment = One step task -> Just make an appointment
     max_steps: 150
     score_range: [0.01, 0.99]
-    grader:
-      function: hospitalmanage_triage_env.server.graders.easy_grader
-      task_length: 1
+    task_length: 1
+    grader: hospitalmanage_triage_env.server.graders.easy_grader
 
   - id: hmt002
     difficulty: medium
     description: Test the hospital management triage environment =  Two step task -> Get the proper doctor for the patient and then make an appointment
     max_steps: 150
     score_range: [0.01, 0.99]
-    grader:
-      function: hospitalmanage_triage_env.server.graders.medium_grader
-      task_length: 2
+    task_length: 2
+    grader: hospitalmanage_triage_env.server.graders.medium_grader
 
   - id: hmt003
     difficulty: hard
     description: Test the hospital management triage environment =  Three step task -> Get the proper doctor for the patient, make an appointment, and then check the appointment details
     max_steps: 150
     score_range: [0.01, 0.99]
-    grader:
-      function: hospitalmanage_triage_env.server.graders.hard_grader
-      task_length: 3
+    task_length: 3
+    grader: hospitalmanage_triage_env.server.graders.hard_grader
